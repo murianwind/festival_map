@@ -1,0 +1,50 @@
+name: 축제 데이터 갱신
+
+# PC 스케줄러 컨테이너의 cron이 GitHub API로 workflow_dispatch를 호출한다.
+on:
+  workflow_dispatch:
+
+# 대기 중인 오래된 실행은 새 실행이 들어오면 자동으로 대체된다
+concurrency:
+  group: update-festivals
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: self-hosted
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 수집 후 커밋
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+        run: |
+          git config user.name "festival-bot"
+          git config user.email "festival-bot@users.noreply.github.com"
+          # push가 실패하면 최신 상태로 되돌리고 처음부터 다시 수집한다.
+          # (충전소 지도에서 rebase 재시도가 데이터를 덮어써 유실됐던 문제 재발 방지)
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            if ! python3 scripts/fetch_festivals.py; then
+              echo "수집 결과가 비정상이라 기존 데이터를 유지합니다."
+              exit 1
+            fi
+            git add docs/festivals.json data/geocode_cache.json
+            if git diff --cached --quiet; then
+              echo "변경 없음"
+              exit 0
+            fi
+            git commit -m "축제 데이터 갱신 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "push 실패 ($attempt/3) - 처음부터 다시 실행합니다."
+            sleep $((attempt * 10))
+          done
+          exit 1
