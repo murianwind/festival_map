@@ -1,7 +1,10 @@
 name: 축제 데이터 갱신
 
-# PC 스케줄러 컨테이너의 cron이 GitHub API로 workflow_dispatch를 호출한다.
+# 매일 05:00 KST(= 20:00 UTC)에 GitHub 클라우드 러너에서 실행한다.
+# Actions 탭의 Run workflow 버튼으로 수동 실행도 가능하다.
 on:
+  schedule:
+    - cron: "0 20 * * *"
   workflow_dispatch:
 
 # 대기 중인 오래된 실행은 새 실행이 들어오면 자동으로 대체된다
@@ -14,10 +17,15 @@ permissions:
 
 jobs:
   update:
-    runs-on: self-hosted
+    # data.go.kr 호출이 클라우드 러너에서 막히면 self-hosted로 바꾼다
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: 수집 후 커밋
         env:
