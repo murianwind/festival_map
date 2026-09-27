@@ -18,12 +18,6 @@ function festival(world, name) {
   return world.festivals.get(name);
 }
 
-function datesBetween(start, end) {
-  const result = [];
-  for (let d = start; d <= end; d = Rules.addDays(d, 1)) result.push(d);
-  return result;
-}
-
 function tagLabels(tags) {
   return tags.map((t) => Rules.TAG_LABELS[t]);
 }
@@ -59,12 +53,8 @@ When("표시 규칙을 적용하면", function () {
   }
 });
 
-Then("축제 {string}는 캘린더의 {string}부터 {string}까지 모든 날짜에 표시된다", function (name, start, end) {
-  assert.deepEqual(this.results.get(name).calendarDates, datesBetween(start, end));
-});
-
-Then("축제 {string}는 캘린더의 {string}에만 표시된다", function (name, day) {
-  assert.deepEqual(this.results.get(name).calendarDates, [day]);
+Then("축제 {string}는 캘린더의 {string}에 표시된다", function (name, days) {
+  assert.deepEqual(this.results.get(name).calendarDates, days.split(",").map((s) => s.trim()));
 });
 
 Then("축제 {string}는 캘린더에 표시되지 않는다", function (name) {

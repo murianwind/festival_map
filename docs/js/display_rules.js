@@ -60,13 +60,6 @@
     return `${get("year")}-${get("month")}-${get("day")}`;
   }
 
-  function firstHolidayBetween(from, to, holidaySet) {
-    for (let d = from; d <= to; d = addDays(d, 1)) {
-      if (isHoliday(d, holidaySet)) return d;
-    }
-    return null;
-  }
-
   function datesBetween(from, to) {
     const result = [];
     for (let d = from; d <= to; d = addDays(d, 1)) result.push(d);
@@ -77,12 +70,10 @@
     return typeof festival.lat === "number" && typeof festival.lon === "number";
   }
 
-  /** 정상 날짜 축제가 캘린더에 올라갈 날짜들. 장기 여부는 따로 판단한다. */
+  /** 정상 날짜 축제가 캘린더에 올라갈 날짜: 오늘 이후 남은 기간 중 휴일만. */
   function calendarDatesFor(start, end, today, holidaySet) {
-    if (end < today) return [];
-    if (start >= today) return datesBetween(start, end);
-    const holiday = firstHolidayBetween(today, end, holidaySet);
-    return holiday ? [holiday] : [];
+    const from = start > today ? start : today;
+    return datesBetween(from, end).filter((d) => isHoliday(d, holidaySet));
   }
 
   /** 날짜 오류 축제가 사이드바에 올라갈지: 두 날짜가 모두 지났으면 숨긴다. */
