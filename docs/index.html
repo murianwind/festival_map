@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>전국 축제 지도</title>
+  <meta name="description" content="날짜를 고르면 그날 열리는 전국 축제를 지도에서 보여줍니다.">
+  <meta name="theme-color" content="#F6F7F9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>전국 축제 지도</h1>
+    <span id="updated" class="updated"></span>
+    <button type="button" id="otherButton" class="other-button" aria-controls="drawer">
+      기타 축제 <span id="otherCount" class="other-count">0</span>
+    </button>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-label="날짜 선택">
+      <div id="calendar" class="calendar"></div>
+      <h2 id="dayTitle" class="day-title"></h2>
+      <ul id="dayList" class="day-list"></ul>
+    </section>
+    <section class="map-area" aria-label="축제 지도">
+      <div id="map" class="map"></div>
+      <div id="detail" class="detail" hidden role="dialog" aria-label="축제 정보"></div>
+    </section>
+  </main>
+
+  <aside id="drawer" class="drawer" aria-hidden="true" aria-label="기타 축제">
+    <div class="drawer-head">
+      <div>
+        <h2>기타 축제</h2>
+        <p>2주 이상 열리거나, 날짜·위치가 불확실한 축제</p>
+      </div>
+      <button type="button" class="drawer-close" aria-label="닫기">×</button>
+    </div>
+    <div id="drawerList" class="drawer-list"></div>
+  </aside>
+
+  <script src="config.js"></script>
+  <script src="js/display_rules.js"></script>
+  <script src="js/format.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/day_list.js"></script>
+  <script src="js/map_view.js"></script>
+  <script src="js/detail_card.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "festival-map",
+  "private": true,
+  "scripts": { "test": "cucumber-js" },
+  "devDependencies": { "@cucumber/cucumber": "^11.0.0" }
+}
