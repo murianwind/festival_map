@@ -53,12 +53,16 @@ button { font: inherit; color: inherit; }
   grid-template-columns: var(--panel-width) 1fr;
   height: calc(100% - var(--topbar-height));
 }
+/* 달력·휴가 기간은 고정, 축제 목록만 스크롤 */
 .panel {
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   border-right: 1px solid var(--line);
   background: var(--surface);
-  padding: 20px 20px 32px;
 }
+.panel-fixed { flex: none; padding: 20px 20px 0; border-bottom: 1px solid var(--line); }
 .map-area { position: relative; min-height: 0; }
 .map { position: absolute; inset: 0; }
 .map-message {
@@ -181,7 +185,7 @@ button { font: inherit; color: inherit; }
 .vac-range { font-weight: 700; color: var(--blue); }
 
 /* 선택한 날의 축제 목록 */
-.day-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.day-list { flex: 1; min-height: 0; overflow-y: auto; list-style: none; margin: 0; padding: 0 20px 32px; }
 .day-list button {
   width: 100%;
   display: block;
@@ -319,10 +323,18 @@ button { font: inherit; color: inherit; }
   .updated { display: none; }
   .layout { display: flex; flex-direction: column; height: auto; }
   .panel { display: contents; }
-  .calendar { order: 1; padding: 14px 14px 0; background: var(--surface); }
-  .vacation { order: 2; margin: 0; padding: 12px 14px; background: var(--surface); }
-  .map-area { order: 3; height: 55vh; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .day-list { order: 4; margin: 0; padding: 4px 14px 32px; }
+  /* 화면 전체가 스크롤되므로 달력·휴가 기간 묶음을 위쪽에 붙여둔다 */
+  .panel-fixed {
+    order: 1;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 14px 14px 0;
+    background: var(--surface);
+  }
+  .vacation { margin: 0; padding: 12px 0; }
+  .map-area { order: 2; height: 55vh; border-bottom: 1px solid var(--line); }
+  .day-list { order: 3; overflow: visible; padding: 4px 14px 32px; }
   .cal-title { font-size: 1.375rem; }
   .cal-cell { min-height: 48px; }
   .cal-num { font-size: 1.0625rem; }
