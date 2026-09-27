@@ -24,6 +24,7 @@
 - `scripts/` 수집 파이프라인 (표준 라이브러리 + curl만 사용)
 - `docs/` GitHub Pages 정적 페이지, `docs/festivals.json`은 수집 결과
 - `data/geocode_cache.json` 주소 검색 캐시 (실패는 30일 후 재검색)
+- 수집은 GitHub 클라우드 러너에서 매일 05:00 KST 자동 실행 (`update-festivals.yml`)
 - `features/` BDD 시나리오 — `pipeline/`은 pytest-bdd, `web/`은 cucumber-js로 실행
 
 ## 테스트
