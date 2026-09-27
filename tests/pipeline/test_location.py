@@ -1,3 +1,5 @@
+import re
+
 from pytest_bdd import given, parsers, scenarios, then, when
 
 from festival_locator import FestivalLocator
@@ -89,3 +91,22 @@ def then_source(ctx, source):
 @then(parsers.re(r"주소 검색은 (?P<count>\d+)회 호출된다"))
 def then_calls(ctx, count):
     assert ctx.get("geocoder", FakeGeocoder()).calls == int(count)
+
+
+@given(parsers.re(r"원본 행들의 좌표가 (?P<coords>.+)이다"))
+def given_member_coords(ctx, coords):
+    rows = []
+    for pair in re.findall(r'"([^"]*)"', coords):
+        lat, lon = [part.strip() for part in pair.split(",")]
+        rows.append({"latitude": lat, "longitude": lon, "rdnmadr": "", "lnmadr": ""})
+    ctx["rows"] = rows
+
+
+@when("축제의 모든 위치를 모으면")
+def when_collect(ctx):
+    ctx["locations"] = _locator(ctx).locate_all(ctx["rows"])
+
+
+@then(parsers.re(r"위치는 (?P<count>\d+)개다"))
+def then_location_count(ctx, count):
+    assert len(ctx["locations"]) == int(count)

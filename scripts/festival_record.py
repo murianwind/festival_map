@@ -2,6 +2,7 @@
 import hashlib
 
 from festival_cleaner import normalize_name
+from festival_locator import SOURCE_NONE
 from homepage_links import to_links
 
 # 화면(팝업·사이드바)에 표시하는 필드
@@ -14,7 +15,8 @@ def _stable_id(row):
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:12]
 
 
-def to_record(row, location, region):
+def to_record(row, locations, region):
+    """locations: Location 목록(합친 축제는 여러 곳). 비어 있으면 위치 미확인."""
     return {
         "id": _stable_id(row),
         "name": (row.get("fstvlNm") or "").strip(),
@@ -24,8 +26,7 @@ def to_record(row, location, region):
         "start": (row.get("fstvlStartDate") or "").strip(),
         "end": (row.get("fstvlEndDate") or "").strip(),
         "dateStatus": row["dateStatus"],
-        "lat": location.lat,
-        "lon": location.lon,
-        "locationSource": location.source,
+        "locations": [{"lat": loc.lat, "lon": loc.lon} for loc in locations],
+        "locationSource": locations[0].source if locations else SOURCE_NONE,
         "region": region,
     }

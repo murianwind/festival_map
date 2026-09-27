@@ -2,6 +2,7 @@
 (function (root) {
   "use strict";
   const { escapeHtml, festivalBody } = root.FestivalFormat;
+  const { hasLocation } = root.DisplayRules;
 
   function createSidebar(panel, list, labels) {
     function open() {
@@ -17,7 +18,7 @@
 
     function itemHtml({ festival, tags }) {
       const tagHtml = tags.map((t) => `<span class="tag tag-${t}">${escapeHtml(labels[t])}</span>`).join("");
-      const located = typeof festival.lat === "number";
+      const located = hasLocation(festival);
       return `
         <li class="side-item">
           <button type="button" class="side-item-head" data-id="${escapeHtml(festival.id)}"

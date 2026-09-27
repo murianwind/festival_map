@@ -60,7 +60,7 @@
     const pick = (group) => detail.show(group);
 
     function showOne(festival) {
-      if (mapView) mapView.focus(festival, pick);
+      if (mapView && Rules.hasLocation(festival)) mapView.focus(festival, pick);
       detail.show([festival]);
     }
 

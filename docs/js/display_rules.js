@@ -67,7 +67,7 @@
   }
 
   function hasLocation(festival) {
-    return typeof festival.lat === "number" && typeof festival.lon === "number";
+    return Array.isArray(festival.locations) && festival.locations.length > 0;
   }
 
   /** 정상 날짜 축제가 캘린더에 올라갈 날짜: 오늘 이후 남은 기간 중 휴일만. */
@@ -145,9 +145,31 @@
       }));
   }
 
+  function pinKey(location) {
+    return `${location.lat.toFixed(5)},${location.lon.toFixed(5)}`;
+  }
+
+  /**
+   * 축제 위치를 지도 핀으로 묶는다. 한 축제가 여러 곳이면 핀도 여러 개,
+   * 같은 좌표의 여러 축제는 핀 하나.
+   * @returns {{key:string, lat:number, lon:number, festivals:object[]}[]}
+   */
+  function groupPins(festivals) {
+    const pins = new Map();
+    for (const festival of festivals) {
+      for (const location of festival.locations || []) {
+        const key = pinKey(location);
+        if (!pins.has(key)) pins.set(key, { key, lat: location.lat, lon: location.lon, festivals: [] });
+        const pin = pins.get(key);
+        if (!pin.festivals.includes(festival)) pin.festivals.push(festival);
+      }
+    }
+    return [...pins.values()];
+  }
+
   return {
     TAG_LABELS,
     addDays, todayInSeoul,
-    classifyFestival, buildView, groupByRegion,
+    classifyFestival, buildView, groupByRegion, groupPins, pinKey, hasLocation,
   };
 });

@@ -12,7 +12,7 @@ function festival(world, name) {
   if (!world.festivals.has(name)) {
     world.festivals.set(name, {
       id: name, name, start: "", end: "", dateStatus: "ok",
-      lat: 37.5, lon: 127.0, region: "서울특별시",
+      locations: [{ lat: 37.5, lon: 127.0 }], region: "서울특별시",
     });
   }
   return world.festivals.get(name);
@@ -43,7 +43,7 @@ Given("축제 {string}의 날짜 오류 기간은 {string}부터 {string}까지�
 });
 
 Given("축제 {string}는 위치가 없다", function (name) {
-  Object.assign(festival(this, name), { lat: null, lon: null });
+  Object.assign(festival(this, name), { locations: [] });
 });
 
 When("표시 규칙을 적용하면", function () {
@@ -99,4 +99,29 @@ Then("지역 순서는 {string}이다", function (regions) {
 
 Then("{string} 그룹에는 {int}건이 있다", function (region, count) {
   assert.equal(this.groups.find((g) => g.region === region).items.length, count);
+});
+
+Given(/^축제 "([^"]*)"의 위치가 (.+)이다$/, function (name, coords) {
+  const locations = [...coords.matchAll(/"([^"]*)"/g)].map(([, pair]) => {
+    const [lat, lon] = pair.split(",").map(Number);
+    return { lat, lon };
+  });
+  Object.assign(festival(this, name), { locations });
+});
+
+When("핀을 묶으면", function () {
+  this.pins = Rules.groupPins([...this.festivals.values()]);
+});
+
+Then("핀은 {int}개다", function (count) {
+  assert.equal(this.pins.length, count);
+});
+
+Then("모든 핀에 {string}가 있다", function (name) {
+  for (const pin of this.pins) assert.ok(pin.festivals.some((f) => f.name === name));
+});
+
+Then("그 핀에는 {string}가 있다", function (names) {
+  const actual = this.pins[0].festivals.map((f) => f.name).sort((a, b) => a.localeCompare(b, "ko"));
+  assert.deepEqual(actual, names.split(",").map((s) => s.trim()));
 });

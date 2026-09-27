@@ -34,7 +34,18 @@ def given_full_row(ctx, name):
 @when("저장 레코드로 변환하면")
 def when_convert(ctx):
     location = Location(37.55985381, 127.1308316, "coords")
-    ctx["record"] = to_record(ctx["row"], location, "서울특별시")
+    ctx["record"] = to_record(ctx["row"], [location], "서울특별시")
+
+
+@when(parsers.re(r"위치 (?P<count>\d+)곳으로 저장 레코드를 만들면"))
+def when_convert_many(ctx, count):
+    locations = [Location(34.5 + i, 126.3, "coords") for i in range(int(count))]
+    ctx["record"] = to_record(ctx["row"], locations, "전남광주통합특별시")
+
+
+@then(parsers.re(r"레코드의 위치는 (?P<count>\d+)개다"))
+def then_record_locations(ctx, count):
+    assert len(ctx["record"]["locations"]) == int(count)
 
 
 @then(parsers.re(r'레코드의 표시 필드는 "(?P<fields>[^"]*)"이다'))

@@ -1,5 +1,6 @@
 """축제 위치를 좌표 → 도로명주소 → 지번주소 순서로 정한다."""
 import datetime as dt
+import math
 from dataclasses import dataclass
 
 from address_normalizer import KIND_JIBUN, KIND_ROAD, query_candidates
@@ -8,6 +9,7 @@ from address_normalizer import KIND_JIBUN, KIND_ROAD, query_candidates
 LAT_RANGE = (33.0, 39.0)
 LON_RANGE = (124.0, 132.0)
 FAILED_RETRY_DAYS = 30
+SAME_PLACE_KM = 1.0  # 기관마다 같은 장소를 조금씩 다른 좌표로 등록하는 경우를 한 곳으로 본다
 
 SOURCE_COORDS = "coords"
 SOURCE_ROAD = "rdnmadr"
@@ -20,6 +22,14 @@ class Location:
     lat: float | None
     lon: float | None
     source: str
+
+
+def distance_km(a, b):
+    """두 Location 사이 거리(하버사인)."""
+    lat1, lat2 = math.radians(a.lat), math.radians(b.lat)
+    d_lat, d_lon = lat2 - lat1, math.radians(b.lon - a.lon)
+    h = math.sin(d_lat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(d_lon / 2) ** 2
+    return 6371.0 * 2 * math.asin(math.sqrt(h))
 
 
 def parse_coords(lat_text, lon_text):
@@ -83,3 +93,14 @@ class FestivalLocator:
             if found:
                 return Location(found[0], found[1], source)
         return Location(None, None, SOURCE_NONE)
+
+    def locate_all(self, rows):
+        """합친 축제의 원본 행마다 위치를 찾아, 1km 안의 위치는 하나로 모은다."""
+        found = []
+        for row in rows:
+            location = self.locate(row)
+            if location.lat is None:
+                continue
+            if all(distance_km(location, known) > SAME_PLACE_KM for known in found):
+                found.append(location)
+        return found

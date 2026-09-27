@@ -12,7 +12,7 @@ import sys
 import http_client
 from festival_api import fetch_all
 from festival_cleaner import clean_rows
-from festival_locator import SOURCE_NONE, FestivalLocator
+from festival_locator import FestivalLocator
 from festival_record import to_record
 from festival_store import is_suspicious_drop, load_json, save_json
 from holiday_source import HOLIDAY_ICS_URL, holidays_from_year, parse_ics
@@ -51,10 +51,10 @@ def run_pipeline(today, fetch_rows, fetch_holidays, geocoder, cache, previous, g
     locator = FestivalLocator(geocoder, cache, today)
     records, unresolved = [], []
     for row in clean_rows(rows, today):
-        location = locator.locate(row)
+        locations = locator.locate_all(row["_members"])
         region = classify_region(row.get("rdnmadr"), row.get("lnmadr"), row.get("insttNm"))
-        records.append(to_record(row, location, region))
-        if location.source == SOURCE_NONE:
+        records.append(to_record(row, locations, region))
+        if not locations:
             unresolved.append(f"{row.get('fstvlNm')} | {row.get('rdnmadr')} | {row.get('lnmadr')}")
 
     if is_suspicious_drop(len(records), previous_count):

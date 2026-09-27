@@ -29,3 +29,8 @@ def then_count(ctx, count):
 @then(parsers.re(r'남은 축제의 "(?P<field>[^"]*)"는 "(?P<value>[^"]*)"이다'))
 def then_field(ctx, field, value):
     assert ctx["result"][0][field] == value
+
+
+@then(parsers.re(r"남은 축제의 원본 행은 (?P<count>\d+)개다"))
+def then_members(ctx, count):
+    assert len(ctx["result"][0]["_members"]) == int(count)
