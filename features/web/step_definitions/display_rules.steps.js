@@ -6,6 +6,7 @@ Before(function () {
   this.holidays = new Set();
   this.festivals = new Map();
   this.today = null;
+  this.vacation = null;
 });
 
 function festival(world, name) {
@@ -46,10 +47,17 @@ Given("축제 {string}는 위치가 없다", function (name) {
   Object.assign(festival(this, name), { locations: [] });
 });
 
+Given("휴가 기간은 {string}부터 {string}까지이다", function (start, end) {
+  this.vacation = { start, end };
+});
+
 When("표시 규칙을 적용하면", function () {
+  const days = this.vacation
+    ? Rules.withExtraDays(this.holidays, this.vacation.start, this.vacation.end)
+    : this.holidays;
   this.results = new Map();
   for (const [name, f] of this.festivals) {
-    this.results.set(name, Rules.classifyFestival(f, this.today, this.holidays));
+    this.results.set(name, Rules.classifyFestival(f, this.today, days));
   }
 });
 

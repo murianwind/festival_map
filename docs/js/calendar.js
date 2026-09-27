@@ -27,7 +27,7 @@
   /**
    * @param {HTMLElement} el
    * @param {{month:string, today:string, lastMonth:string, selected:string,
-   *   counts:Map<string,number>, holidayNames:Object<string,string>,
+   *   counts:Map<string,number>, holidayNames:Object<string,string>, extraDays:Set<string>,
    *   onSelect:(day:string)=>void, onMonth:(month:string)=>void}} s
    */
   function renderCalendar(el, s) {
@@ -50,6 +50,7 @@
       if (w === 0 || holiday) classes.push("is-red");
       else if (w === 6) classes.push("is-blue");
       if (past) classes.push("is-past");
+      if (s.extraDays.has(day)) classes.push("is-extra");
       if (day === s.today) classes.push("is-today");
       if (day === s.selected) classes.push("is-selected");
       if (count) classes.push("has-festival");

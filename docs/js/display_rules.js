@@ -145,6 +145,12 @@
       }));
   }
 
+  /** 공휴일 목록에 사용자가 정한 기간(예: 휴가)의 날짜를 더한 새 Set. 시작·끝이 뒤바뀌어도 된다. */
+  function withExtraDays(holidaySet, start, end) {
+    const [from, to] = start <= end ? [start, end] : [end, start];
+    return new Set([...holidaySet, ...datesBetween(from, to)]);
+  }
+
   function pinKey(location) {
     return `${location.lat.toFixed(5)},${location.lon.toFixed(5)}`;
   }
@@ -170,6 +176,6 @@
   return {
     TAG_LABELS,
     addDays, todayInSeoul,
-    classifyFestival, buildView, groupByRegion, groupPins, pinKey, hasLocation,
+    classifyFestival, buildView, groupByRegion, groupPins, pinKey, hasLocation, withExtraDays,
   };
 });
