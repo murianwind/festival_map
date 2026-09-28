@@ -9,21 +9,27 @@
 
   /**
    * @param {HTMLElement} el
-   * @param {{today:string, onApply:(start:string, end:string)=>void, onClear:()=>void}} s
+   * @param {{pickerStartValue:()=>string, onApply:(start:string, end:string)=>void, onClear:()=>void}} s
    */
   function createVacationBar(el, s) {
     function renderEditing() {
       el.innerHTML = `
         <label class="vac-label" for="vacStart">휴가 기간</label>
         <div class="vac-row">
-          <input id="vacStart" type="date" min="${s.today}" aria-label="휴가 시작일">
+          <input id="vacStart" type="date" aria-label="휴가 시작일">
           <span aria-hidden="true">~</span>
-          <input id="vacEnd" type="date" min="${s.today}" aria-label="휴가 종료일">
+          <input id="vacEnd" type="date" aria-label="휴가 종료일">
           <button type="button" class="vac-apply">적용</button>
         </div>
         <p class="vac-hint">이 기간에는 평일 축제도 보여줍니다. 새로고침하면 지워집니다.</p>`;
       const start = el.querySelector("#vacStart");
       const end = el.querySelector("#vacEnd");
+      // 값이 없는 채로 열면 항상 오늘이 있는 달로 뜨므로, 보던 달의 날짜를 미리 채워둔다
+      const openToViewedMonth = (input, fallback) => {
+        if (!input.value) input.value = fallback();
+      };
+      start.addEventListener("focus", () => openToViewedMonth(start, s.pickerStartValue));
+      end.addEventListener("focus", () => openToViewedMonth(end, () => start.value || s.pickerStartValue()));
       start.addEventListener("change", () => { if (!end.value) end.value = start.value; });
       el.querySelector(".vac-apply").addEventListener("click", () => {
         if (!start.value || !end.value) {

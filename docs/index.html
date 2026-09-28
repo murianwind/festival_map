@@ -15,6 +15,9 @@
   <header class="topbar">
     <h1>전국 축제 지도</h1>
     <span id="updated" class="updated"></span>
+    <button type="button" id="dayPickerToggle" class="day-picker-toggle" aria-controls="dayPicker" aria-expanded="false">
+      날짜 선택
+    </button>
     <button type="button" id="otherButton" class="other-button" aria-controls="drawer">
       기타 축제 <span id="otherCount" class="other-count">0</span>
     </button>
@@ -28,6 +31,7 @@
       </div>
       <ul id="dayList" class="day-list" aria-label="선택한 날의 축제"></ul>
     </section>
+
     <section class="map-area" aria-label="축제 지도">
       <div id="map" class="map"></div>
       <div id="detail" class="detail" hidden role="dialog" aria-label="축제 정보"></div>
@@ -45,12 +49,15 @@
     <div id="drawerList" class="drawer-list"></div>
   </aside>
 
+  <div id="dayPicker" class="day-picker-backdrop" aria-hidden="true"></div>
   <script src="config.js"></script>
   <script src="js/display_rules.js"></script>
   <script src="js/format.js"></script>
+  <script src="js/view_state.js"></script>
   <script src="js/calendar.js"></script>
   <script src="js/day_list.js"></script>
   <script src="js/vacation_bar.js"></script>
+  <script src="js/day_picker.js"></script>
   <script src="js/map_view.js"></script>
   <script src="js/detail_card.js"></script>
   <script src="js/sidebar.js"></script>

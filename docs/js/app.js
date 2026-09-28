@@ -6,6 +6,7 @@
   const { escapeHtml } = root.FestivalFormat;
   const MOBILE = window.matchMedia("(max-width: 899px)");
   const NO_DAYS = new Set();
+  const ViewState = root.ViewState;
 
   const $ = (id) => document.getElementById(id);
 
@@ -53,38 +54,41 @@
     const sidebar = root.FestivalSidebar.createSidebar($("drawer"), $("drawerList"), Rules.TAG_LABELS);
 
     // 휴가 기간은 메모리에만 둔다(새로고침하면 사라짐)
-    const state = { vacationDays: NO_DAYS, view: null, days: [], selected: null, month: null, lastMonth: null };
+    const state = { vacationDays: NO_DAYS, view: null, days: [], selected: null, month: monthKey(today), lastMonth: null };
+    const dayPicker = MOBILE.matches
+      ? root.FestivalDayPicker.createDayPicker(document.querySelector(".panel-fixed"), $("dayPicker"))
+      : null;
 
     function showOne(festival) {
       if (mapView && Rules.hasLocation(festival)) mapView.focus(festival, pick);
       detail.show([festival]);
     }
 
-    /** 휴일(주말·공휴일·휴가 기간) 기준으로 달력·사이드바 내용을 다시 계산한다. */
-    function recompute(preferredDay) {
+    /** 휴일(주말·공휴일·휴가 기간) 기준으로 달력·사이드바 내용을 다시 계산한다. 보던 달은 유지한다. */
+    function recompute() {
       const holidays = state.vacationDays.size
         ? new Set([...publicHolidays, ...state.vacationDays])
         : publicHolidays;
       state.view = Rules.buildView(data.festivals, today, holidays);
       state.days = [...state.view.byDate.keys()].sort();
-      state.lastMonth = monthKey(state.days[state.days.length - 1] || today);
-      const keep = state.days.includes(preferredDay) ? preferredDay : null;
-      state.selected = keep || (state.days.includes(today) ? today : state.days[0] || null);
-      state.month = monthKey(state.selected || today);
+      const next = ViewState.nextViewState({ days: state.days, today, month: state.month, selected: state.selected });
+      state.month = next.month;
+      state.lastMonth = next.lastMonth;
 
       $("otherCount").textContent = String(state.view.sidebar.length);
       sidebar.render(Rules.groupByRegion(state.view.sidebar), (festival) => {
         if (MOBILE.matches) sidebar.close();
         showOne(festival);
       });
-      selectDay(state.selected);
+      selectDay(next.selected, { closeDrawer: false });
     }
 
-    function selectDay(day) {
+    function selectDay(day, { closeDrawer = true } = {}) {
       state.selected = day;
       detail.hide();
       renderPanel();
       if (mapView) mapView.show(day ? state.view.byDate.get(day) : [], pick);
+      if (closeDrawer && dayPicker) dayPicker.close();
     }
 
     function renderPanel() {
@@ -100,31 +104,31 @@
         festivals: state.selected ? state.view.byDate.get(state.selected) : [],
         onPick: showOne,
       });
+      if (dayPicker) dayPicker.setButtonLabel(state.selected, holidayNames[state.selected]);
     }
 
     root.FestivalVacation.createVacationBar($("vacation"), {
-      today,
+      pickerStartValue: () => ViewState.pickerStartValue(state.month, today),
       onApply: (from, to) => {
         state.vacationDays = Rules.withExtraDays(NO_DAYS, from, to);
-        // 휴가 첫날부터 보여준다(그날 축제가 없으면 가까운 날)
-        const firstInRange = [...state.vacationDays].find((d) => d >= today);
-        recompute(firstInRange);
+        recompute();
       },
       onClear: () => {
         state.vacationDays = NO_DAYS;
-        recompute(state.selected);
+        recompute();
       },
     });
 
     $("otherButton").addEventListener("click", sidebar.open);
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      if (sidebar.isOpen()) sidebar.close();
+      if (dayPicker && dayPicker.isOpen()) dayPicker.close();
+      else if (sidebar.isOpen()) sidebar.close();
       else detail.hide();
     });
     window.addEventListener("resize", () => mapView && mapView.relayout());
 
-    recompute(today);
+    recompute();
   }
 
   start().catch((error) => showMapMessage(error.message));

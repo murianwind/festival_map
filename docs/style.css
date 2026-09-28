@@ -21,6 +21,8 @@ button { font: inherit; color: inherit; }
 
 /* 상단바 */
 .topbar {
+  position: relative;
+  z-index: 41; /* 모바일 서랍(z-index 40)보다 위에 둬서, 서랍이 열려도 상단 버튼을 계속 누를 수 있게 */
   height: var(--topbar-height);
   display: flex;
   align-items: center;
@@ -46,6 +48,16 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
 }
 .other-count { color: var(--muted); font-variant-numeric: tabular-nums; }
+.day-picker-toggle {
+  display: none;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 
 /* 레이아웃 */
 .layout {
@@ -351,7 +363,58 @@ button { font: inherit; color: inherit; }
   }
 }
 
+/* 모바일: 상단바 버튼 → 지도(위 절반, 고정) → 목록(아래 절반, 스크롤).
+   달력·휴가 기간(.panel-fixed)은 화면 밖 왼쪽 서랍으로 옮겨두고 버튼으로 연다. */
+@media (max-width: 899px) {
+  .day-picker-toggle { display: inline-flex; align-items: center; }
+
+  .layout { display: flex; flex-direction: column; height: calc(100% - var(--topbar-height)); }
+  .panel { display: contents; }
+
+  .map-area { order: 1; flex: 1 1 50%; min-height: 0; border-bottom: 1px solid var(--line); }
+  .day-list {
+    order: 2;
+    flex: 1 1 50%;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 14px calc(24px + env(safe-area-inset-bottom));
+  }
+  .day-list:empty::after { content: "달력에서 날짜를 골라주세요."; display: block; padding: 24px 0; color: var(--muted); }
+
+  .cal-title { font-size: 1.375rem; }
+  .cal-cell { min-height: 48px; }
+  .cal-num { font-size: 1.0625rem; }
+  .cal-holiday { display: none; }
+
+  /* 달력+휴가 기간을 담은 왼쪽 서랍 */
+  .day-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgba(29, 36, 51, 0.32);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s;
+  }
+  .panel-fixed {
+    position: fixed;
+    top: var(--topbar-height); /* 상단바와 겹치지 않게, 그 아래에서 시작 */
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(320px, 84%);
+    overflow-y: auto;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    background: var(--surface);
+    box-shadow: 8px 0 24px rgba(29, 36, 51, 0.16);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+  body.day-picker-open .day-picker-backdrop { opacity: 1; visibility: visible; }
+  body.day-picker-open .panel-fixed { transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .drawer { transition: none; }
+  .drawer, .panel-fixed, .day-picker-backdrop { transition: none; }
   .pin.is-active { transform: none; }
 }
