@@ -97,7 +97,7 @@
         counts: new Map(state.days.map((d) => [d, state.view.byDate.get(d).length])),
         holidayNames, extraDays: state.vacationDays,
         onSelect: selectDay,
-        onMonth: (month) => { state.month = month; renderPanel(); },
+        onMonth: (month) => { state.month = month; vacationBar.reset(); renderPanel(); },
       });
       root.FestivalDayList.renderDayList({
         listEl: $("dayList"),
@@ -107,7 +107,7 @@
       if (dayPicker) dayPicker.setButtonLabel(state.selected, holidayNames[state.selected]);
     }
 
-    root.FestivalVacation.createVacationBar($("vacation"), {
+    const vacationBar = root.FestivalVacation.createVacationBar($("vacation"), {
       pickerStartValue: () => ViewState.pickerStartValue(state.month, today),
       onApply: (from, to) => {
         state.vacationDays = Rules.withExtraDays(NO_DAYS, from, to);
@@ -119,7 +119,7 @@
       },
     });
 
-    $("otherButton").addEventListener("click", sidebar.open);
+    $("otherButton").addEventListener("click", () => (sidebar.isOpen() ? sidebar.close() : sidebar.open()));
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       if (dayPicker && dayPicker.isOpen()) dayPicker.close();

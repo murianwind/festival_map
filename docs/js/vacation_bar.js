@@ -56,6 +56,16 @@
     }
 
     renderEditing();
+
+    return {
+      /** 아직 적용 전(입력 중)이면 값을 비운다. 이미 적용된 휴가 기간은 건드리지 않는다. */
+      reset() {
+        const start = el.querySelector("#vacStart");
+        const end = el.querySelector("#vacEnd");
+        if (start) start.value = "";
+        if (end) end.value = "";
+      },
+    };
   }
 
   root.FestivalVacation = { createVacationBar };

@@ -21,8 +21,6 @@ button { font: inherit; color: inherit; }
 
 /* 상단바 */
 .topbar {
-  position: relative;
-  z-index: 41; /* 모바일 서랍(z-index 40)보다 위에 둬서, 서랍이 열려도 상단 버튼을 계속 누를 수 있게 */
   height: var(--topbar-height);
   display: flex;
   align-items: center;
@@ -267,7 +265,7 @@ button { font: inherit; color: inherit; }
 /* 기타 축제 사이드바 */
 .drawer {
   position: fixed;
-  top: 0;
+  top: var(--topbar-height); /* 상단바 아래에서 시작해 상단바와 겹치지 않게 */
   right: 0;
   bottom: 0;
   z-index: 30;
@@ -282,10 +280,10 @@ button { font: inherit; color: inherit; }
   transition: transform 0.2s ease, visibility 0.2s;
 }
 .drawer.is-open { transform: none; visibility: visible; }
-.drawer-head { position: relative; padding: 16px 52px 12px 20px; padding-top: calc(16px + env(safe-area-inset-top)); border-bottom: 1px solid var(--line); }
+.drawer-head { position: relative; padding: 16px 52px 12px 20px; border-bottom: 1px solid var(--line); }
 .drawer-head h2 { margin: 0; font-size: 1.125rem; font-weight: 800; }
 .drawer-head p { margin: 4px 0 0; color: var(--muted); font-size: 0.8125rem; }
-.drawer-head .drawer-close { top: calc(12px + env(safe-area-inset-top)); right: 12px; }
+.drawer-head .drawer-close { top: 12px; right: 12px; }
 .drawer-list { overflow-y: auto; padding-bottom: env(safe-area-inset-bottom); }
 .side-group-head {
   width: 100%;
