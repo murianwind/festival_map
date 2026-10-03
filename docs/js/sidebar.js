@@ -26,7 +26,7 @@
             <span class="side-item-name">${escapeHtml(festival.name)}</span>
             <span class="side-item-tags">${tagHtml}</span>
           </button>
-          ${located ? "" : `<div class="side-item-body" hidden>${festivalBody(festival) || "<p>표시할 정보가 없습니다.</p>"}</div>`}
+          ${located ? "" : `<div class="side-item-body" hidden>${festivalBody(festival)}</div>`}
         </li>`;
     }
 

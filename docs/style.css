@@ -305,6 +305,22 @@ button { font: inherit; color: inherit; }
 .fb-content { margin: 0 0 8px; font-size: 0.9375rem; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
 .fb-links { margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .fb-links a { color: var(--blue); font-size: 0.875rem; font-weight: 600; word-break: break-all; }
+.fb-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px; /* 터치하기 쉬운 크기 */
+  margin-top: 12px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.fb-search:hover { background: var(--paper); }
 
 /* 기타 축제 사이드바 */
 .drawer {
