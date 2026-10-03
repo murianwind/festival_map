@@ -50,6 +50,7 @@
     let mapView = null;
     const detail = root.FestivalDetail.createDetailCard($("detail"), () => mapView && mapView.clearActive());
     mapView = await createMap();
+    if (mapView) root.FestivalMyLocation.start(mapView, $("myLocation"), $("mapNote"));
     const pick = (group) => detail.show(group);
     const sidebar = root.FestivalSidebar.createSidebar($("drawer"), $("drawerList"), Rules.TAG_LABELS);
 

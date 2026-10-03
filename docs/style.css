@@ -6,6 +6,7 @@
   --line: #D9DEE6;
   --blue: #1F5FAE;
   --red: #C8372D;
+  --here: #12805C;
   --lantern: #F2B705;
   --panel-width: 380px;
   --topbar-height: 56px;
@@ -226,6 +227,49 @@ button { font: inherit; color: inherit; }
 }
 .pin.is-active { background: var(--red); transform: scale(1.25); }
 
+/* 현재 위치: 축제 핀(파랑)과 구분되도록 초록 점 + 퍼지는 테두리 */
+.me-dot {
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--here);
+  box-shadow: 0 0 0 6px rgba(18, 128, 92, 0.22), 0 1px 3px rgba(29, 36, 51, 0.4);
+}
+.my-location {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  box-shadow: 0 2px 8px rgba(29, 36, 51, 0.16);
+  cursor: pointer;
+}
+.my-location[hidden], .map-note[hidden] { display: none; }
+.my-location.is-on { color: var(--here); }
+.my-location[aria-busy="true"] { opacity: 0.55; cursor: progress; }
+.map-note {
+  position: absolute;
+  top: 64px;
+  right: 12px;
+  z-index: 10;
+  max-width: min(280px, calc(100% - 24px));
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
 /* 상세 카드 (공통 본문은 사이드바와 같이 쓴다) */
 .detail {
   position: absolute;
@@ -404,12 +448,12 @@ button { font: inherit; color: inherit; }
     overflow-y: auto;
     padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
     background: var(--surface);
-    box-shadow: 8px 0 24px rgba(29, 36, 51, 0.16);
     transform: translateX(-100%);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   body.day-picker-open .day-picker-backdrop { opacity: 1; visibility: visible; }
-  body.day-picker-open .panel-fixed { transform: none; }
+  /* 그림자는 열렸을 때만: 닫힌 서랍의 그림자가 화면 왼쪽으로 번지지 않게 */
+  body.day-picker-open .panel-fixed { transform: none; box-shadow: 8px 0 24px rgba(29, 36, 51, 0.16); }
 }
 
 @media (prefers-reduced-motion: reduce) {

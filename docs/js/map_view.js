@@ -5,6 +5,7 @@
   const KOREA_CENTER = [36.4, 127.8];
   const KOREA_LEVEL = 13;
   const SINGLE_LEVEL = 6;
+  const MY_LOCATION_LEVEL = 7;
 
   function createMapView(container) {
     const kakao = root.kakao;
@@ -14,6 +15,8 @@
     });
     let overlays = [];
     let pins = new Map(); // pinKey -> 핀 버튼
+    let myOverlay = null; // 현재 위치 점. 핀과 따로 두어 날짜를 바꿔도 지워지지 않는다
+    let myPosition = null;
 
     function clear() {
       overlays.forEach((o) => o.setMap(null));
@@ -77,9 +80,35 @@
       fit(festival.locations.map((l) => new kakao.maps.LatLng(l.lat, l.lon)));
     }
 
+    /** 현재 위치 점을 표시하거나 옮긴다. */
+    function setMyLocation(lat, lon) {
+      myPosition = new kakao.maps.LatLng(lat, lon);
+      if (myOverlay) {
+        myOverlay.setPosition(myPosition);
+        return;
+      }
+      const dot = document.createElement("div");
+      dot.className = "me-dot";
+      dot.setAttribute("role", "img");
+      dot.setAttribute("aria-label", "현재 위치");
+      myOverlay = new kakao.maps.CustomOverlay({
+        position: myPosition, content: dot, xAnchor: 0.5, yAnchor: 0.5, zIndex: 1,
+      });
+      myOverlay.setMap(map);
+    }
+
+    /** 현재 위치로 지도를 옮긴다. 너무 멀리 보고 있으면 동네가 보이는 정도로 확대한다. */
+    function goToMyLocation() {
+      if (!myPosition) return;
+      if (map.getLevel() > MY_LOCATION_LEVEL) map.setLevel(MY_LOCATION_LEVEL);
+      map.panTo(myPosition);
+    }
+
     return {
       show,
       focus,
+      setMyLocation,
+      goToMyLocation,
       clearActive: () => setActive([]),
       relayout: () => map.relayout(),
     };
